@@ -17,7 +17,7 @@ controller.login = async function(req, res) {
   console.log('****** INSECURE SQL:', query)
 
   try {
-    const users = await prisma.$queryRawUnsafe(query)
+    const users = await prisma.$queryRaw`SELECT * FROM "User" WHERE username = ${username} AND password = ${password}`
 
     if(users.length > 0) {
       return res.send({
