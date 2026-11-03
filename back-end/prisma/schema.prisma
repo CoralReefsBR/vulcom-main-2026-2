@@ -59,7 +59,7 @@ model User {
   username          String        @unique   // Não pode repetir
   email             String        @unique
   // OWASP Top 10:2025 A04 - Falhas de Criptografia:
-  // os controllers e o seed gravam neste campo a senha em texto puro, sem hash.
+  // este campo armazena um hash Argon2id da senha, nunca a senha em texto puro.
   password          String
   is_admin          Boolean       @default(false)
   created_cars      Car[]         @relation("created_user")
@@ -72,4 +72,3 @@ model XssComment {
   content    String
   created_at DateTime @default(now())
 }
-

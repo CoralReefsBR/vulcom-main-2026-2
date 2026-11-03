@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker/locale/pt_BR'
 import { PrismaClient } from '@prisma/client'
+import argon2 from 'argon2'
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,26 @@ const colors = [
 ]
 
 async function main() {
+  // Converte senhas antigas que já estejam gravadas em texto puro.
+  const existingUsers = await prisma.user.findMany({
+    select: { id: true, username: true, password: true }
+  })
+
+  for(const existingUser of existingUsers) {
+    if(existingUser.password.startsWith('$argon2id$')) continue
+
+    const plainPassword = existingUser.username === 'admin'
+      ? 'Vulcom@DSM'
+      : existingUser.password
+
+    await prisma.user.update({
+      where: { id: existingUser.id },
+      data: {
+        password: await argon2.hash(plainPassword, { type: argon2.argon2id })
+      }
+    })
+  }
+
   // Comentário inicial do desafio de XSS
   await prisma.xssComment.create({
     data: { content: 'Bem-vindo ao desafio de XSS!' }
@@ -34,12 +55,14 @@ async function main() {
     where: {
       email: 'admin@vulcom.com.br'
     },
-    update: {},
+    update: {
+      password: await argon2.hash('Vulcom@DSM', { type: argon2.argon2id })
+    },
     create: {
       fullname: 'Administrador do Sistema',
       username: 'admin',
       email: 'admin@vulcom.com.br',
-      password: 'Vulcom@DSM',
+      password: await argon2.hash('Vulcom@DSM', { type: argon2.argon2id }),
       is_admin: true
     }
   })
@@ -53,7 +76,7 @@ async function main() {
         username: faker.internet.username(),
         email: faker.internet.email(),
         // OWASP Top 10:2025 A07 - Falhas de Autenticação: senha fraca e compartilhada entre contas.
-        password: 'senha123',
+        password: await argon2.hash('senha123', { type: argon2.argon2id }),
         is_admin: i === 0,
       },
     });
