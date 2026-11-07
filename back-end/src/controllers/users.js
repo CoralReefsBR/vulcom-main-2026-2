@@ -52,7 +52,8 @@ controller.retrieveOne = async function(req, res) {
     // OWASP Top 10:2025 A01 - Falha no Controle de Acesso:
     // o ID recebido permite consultar qualquer usuário, incluindo seu campo password.
     const result = await prisma.user.findUnique({
-      where: { id: Number(req.params.id) }
+      where: { id: Number(req.params.id) },
+      omit: { password: true }
     })
 
     // Encontrou ~> retorna HTTP 200: OK (implícito)
