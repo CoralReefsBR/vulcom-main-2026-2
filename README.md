@@ -71,32 +71,17 @@ A API ficará disponível na porta `8888` no Codespace.
 
 Copie o arquivo `front-end/.env.local.example` para `front-end/.env.local`.
 
-Para preencher corretamente a chave `VITE_API_BASE`, siga estes passos:
-
-1. No VS Code, abra a aba `PORTS` (ou `PORTAS`) na parte inferior do editor.
-2. Verifique se a porta `8888` do back-end já está listada como pública/forwarded.
-3. Clique no ícone de `Open in Browser` ou copie a URL pública que aparece para a porta `8888`.
-4. O endereço normalmente terá formato parecido com:
-
-```text
-https://<NOME-DO-CODESPACE>-8888.app.github.dev
-```
-
-5. Cole esse valor na variável `VITE_API_BASE`, ficando assim:
+No desenvolvimento, deixe `VITE_API_BASE` vazio. O servidor Vite encaminha as
+chamadas da API para `http://127.0.0.1:8888`, evitando dependência de CORS e de
+uma URL pública para o back-end. Mantenha o back-end em execução na porta 8888.
 
 ```ini
-# Renomeie este arquivo para .env.local e preencha os valores abaixo
-
-# URL pública do back-end no codespace
-VITE_API_BASE="https://<NOME-DO-CODESPACE>-8888.app.github.dev"
-
-# Nome da chave usada para armazenar o token no localStorage
-VITE_AUTH_TOKEN_NAME="_auth"
+VITE_API_BASE=""
 ```
 
-> Em alguns casos, a URL pública só aparece depois que o back-end já foi iniciado uma vez na porta 8888. Se a aba `PORTS` ainda não mostrar uma URL pública, execute primeiro o servidor do back-end e, em seguida, volte para a aba `PORTS` para copiar o endereço gerado.
-
-> Se a porta aparecer como privada ou como `http://localhost:8888`, use a opção de visualização/forwarding do GitHub Codespaces para expor a porta e obter a URL pública correta.
+Se o front-end for servido fora do modo de desenvolvimento (por exemplo,
+produção), configure `VITE_API_BASE` com a URL da API. Nesse caso,
+`ALLOWED_ORIGINS` no back-end deve conter a origem exata do front-end.
 
 ### 3.2 Instalação das dependências
 

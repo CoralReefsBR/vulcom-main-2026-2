@@ -17,8 +17,9 @@ class HttpError extends Error {
 
 const myfetch = {}  // Objeto vazio
 
-// Lê o endereço do back-end a partir do arquivo .env.local
-const baseUrl = import.meta.env.VITE_API_BASE
+// Em desenvolvimento, o Vite encaminha as chamadas à API ao back-end local.
+// Em produção, o endereço vem do arquivo de ambiente.
+const baseUrl = import.meta.env.DEV ? '/api' : import.meta.env.VITE_API_BASE
 
 function getOptions(body = null, method = 'GET') {
   const options = {

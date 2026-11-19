@@ -21,16 +21,19 @@ export default function AuthControl() {
 
   async function handleLogoutButtonClick() {
     if(await askForConfirmation('Deseja realmente sair?')) {
-      // OWASP Top 10:2025 A07 - Falhas de Autenticação:
-      // o logout só remove a cópia local; não revoga o JWT nem encerra o cookie no servidor.
-      // Apaga o token do localStorage
-      window.localStorage.removeItem(import.meta.env.VITE_AUTH_TOKEN_NAME)
-
-      // Remove as informações do usuário autenticado
-      setAuthUser(null)
-
-      // Redireciona para a página de login
-      navigate('/login')
+      showWaiting(true)
+      try {
+        await myfetch.post('/users/logout')
+        setAuthUser(null)
+        navigate('/login')
+      }
+      catch(error) {
+        console.error(error)
+        notify(error.message, 'error')
+      }
+      finally {
+        showWaiting(false)
+      }
     }
   }
 
@@ -45,25 +48,21 @@ export default function AuthControl() {
         <Typography variant="caption">
           {authUser.username}
         </Typography>
-        <Button 
+        <Button
           color="secondary"
           size="small"
           onClick={handleLogoutButtonClick}
-          sx={{
-            ml: 0.75, // ml: marginLeft
-          }}
+          sx={{ ml: 0.75 }}
         >
           Sair
         </Button>
       </>
     )
   }
-  else {
-    return (
-      <Link to="/login">
-        <Button color="secondary">Entrar</Button>
-      </Link>
-    )
-  }
 
+  return (
+    <Link to="/login">
+      <Button color="secondary">Entrar</Button>
+    </Link>
+  )
 }
